@@ -5,6 +5,3 @@ def open_file(path):
     with open(input_file) as f:
         dataset = f.read()
     return dataset
-
-def clean_dataset(text):
-    for x in dataset:
