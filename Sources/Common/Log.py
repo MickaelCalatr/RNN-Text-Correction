@@ -1,5 +1,5 @@
-from configuration import conf
+from Sources.Model.Configuration import config
 
 def log(string):
-    if (conf.verbose):
+    if (config.verbose):
         print(string)

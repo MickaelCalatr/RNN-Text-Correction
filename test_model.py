@@ -104,7 +104,6 @@ def build_graph(keep_prob, rnn_size, num_layers, batch_size, learning_rate, embe
 
 
 
-
 def create_dic(data, labels):
     count = 0
     for line in data:

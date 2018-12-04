@@ -1,0 +1,93 @@
+import configparser
+import argparse
+import json
+
+from Sources.Common.directory_handler import check_path
+
+VERSION = "1.8.3"
+
+ap = argparse.ArgumentParser()
+ap.add_argument("-i", "--input", help = "This is the dataset.", type=str, default="./dataset.json")
+ap.add_argument("-c", "--config_file", help = "Config file of the Network.", default="config.ini")
+
+ap.add_argument("-s", '--save_directory', help = "Directory to save all CNN files.", type=str, default="./Model/")
+ap.add_argument("-v", '--version', action='version', version='%(prog)s V' + str(VERSION))
+ap.add_argument("-l", "--log_verbose", help="Verbose mode to print the log.", type=bool, default=False)
+ap.add_argument("-t", "--test", help="String to test the model.", type=str)
+ap.add_argument("-lr", "--learning_rate", help="This field change the learning rate.", type=float, default=0.0)
+args = vars(ap.parse_args())
+
+class Configuration:
+    def __init__(self, args):
+        super(Configuration, self).__init__()
+        self.input_file = args['input']
+        self.verbose = args['log_verbose']
+        self.directory = check_path(args['save_directory'])
+        self.train_directory = self.directory + "train/"
+        self.summary_directory = self.directory + "log/"
+
+        # Network Conf file
+        conf = configparser.ConfigParser()
+        conf._interpolation = configparser.ExtendedInterpolation()
+        conf.read(args['config_file'])
+
+        # Train
+        if args['learning_rate'] != 0.0:
+            self.learning_rate = args['learning_rate']
+        else:
+            self.learning_rate = self.get(conf, 'Train', 'learning_rate')
+        self.display_step = self.get(conf, 'Train', 'display_step')
+        self.test_step = self.get(conf, 'Train', 'test_step')
+        self.batch_size = self.get(conf, 'Train', 'batch_size')
+        self.cross_validation = self.get(conf, 'Train', 'cross_validation')
+        self.stop = self.get(conf, 'Train', 'stop')
+        # Network
+        self.num_layers = self.get(conf, 'Network', 'num_layers')
+        self.rnn_size = self.get(conf, 'Network', 'rnn_size')
+        self.embedding_size = self.get(conf, 'Network', 'embedding_size')
+        self.direction = self.get(conf, 'Network', 'direction')
+        self.keep_prob = 0.75
+
+        self.test = args['test']
+
+        
+    def get(self, conf, section, key=None):
+        result = {}
+        options = conf.options(section)
+        for option in options:
+            try:
+                result[option] = self.smartcast(conf.get(section, option))
+                if result[option] == -1:
+                    DebugPrint("skip: %s" % option)
+            except:
+                print("exception on %s!" % option)
+                result[option] = None
+        if key == None:
+            return result
+        return result[key]
+
+
+    def smartcast(self, value):
+        tests = [int, float]
+        for test in tests:
+            try:
+                return test(value)
+            except ValueError:
+                continue
+        return value
+
+    def save(self, path_to_save):
+        CNN_Section = "CNN"
+        Image_Section = "Image"
+        cfgfile = open(path_to_save, 'w')
+        Config = configparser.ConfigParser()
+        Config.add_section(CNN_Section)
+        Config.add_section(Image_Section)
+        Config.set(CNN_Section, 'Model', 'model.meta')
+        Config.set(CNN_Section, 'Train_directory', self.directory)
+        Config.set(Image_Section, 'Size', self.CNN.get('Image', 'size'))
+        Config.set(Image_Section, 'Channels', self.CNN.get('Image', 'channels'))
+        Config.write(cfgfile)
+        cfgfile.close()
+
+config = Configuration(args)

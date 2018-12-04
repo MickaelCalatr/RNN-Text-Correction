@@ -1,8 +1,6 @@
 import tensorflow as tf
 
 class InputOp:
-    def __init__(self):
-
     def add_op(self):
         """
         Initialises all input placeholders needed in the graph

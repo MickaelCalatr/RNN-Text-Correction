@@ -6,4 +6,4 @@ def dataset_creator():
     dataset_maker("dataset.json")
 
 if __name__ == "__main__":
-    dataset_creator
+    dataset_creator()

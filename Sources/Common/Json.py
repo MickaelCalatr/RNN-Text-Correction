@@ -1,5 +1,17 @@
 import json
 
+class Dic:
+    def jdefault(o):
+        return o.__dict__
+
+    def save_json(self, path, filename):
+        with open(path + filename, 'w') as outfile:
+            json.dump(self, outfile, default=lambda o: o.__dict__, indent=4)
+
+    def __init__(self):
+        self.vocab_to_int = {}
+        self.int_to_vocab = {}
+
 class Element:
     def __init__(self, line, label):
         self.label = label
