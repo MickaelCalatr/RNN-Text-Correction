@@ -10,9 +10,11 @@ from sklearn.model_selection import train_test_split
 from Sources.Dataset.dataset_augmentation import dataset_augmentation
 from Sources.Common.Log import log
 from Sources.Common.Json import Dic
+from Sources.Common.directory_handler import create_folder
 
 class Dataset:
-    def __init__(self):
+    def __init__(self, cross_validation):
+        self.cross_validation = cross_validation
         self.vocab_to_int = {}
         self.int_to_vocab = {}
         self.train_data = []
@@ -44,6 +46,7 @@ class Dataset:
         json = Dic()
         json.int_to_vocab = self.int_to_vocab
         json.vocab_to_int = self.vocab_to_int
+        create_folder('./Model/')
         json.save_json('./Model/', 'saved_dic.json')
 
     def formating_dataset(self, data, labels):
@@ -91,12 +94,19 @@ class Dataset:
 
         log("[5] Dataset splitting...")
         # Split the data into training and testing sentences
-        self.train_data, self.test_data = train_test_split(int_sentences, test_size = 0.15, shuffle=False)
-        self.train_label, self.test_label = train_test_split(int_labels, test_size = 0.15, shuffle=False)
+        int_sentences = np.array(int_sentences)
+        int_labels = np.array(int_labels)
+        int_sentences, int_labels = self.unison_shuffle(int_sentences, int_labels)
+        self.train_data, self.test_data = train_test_split(int_sentences, test_size=self.cross_validation, shuffle=False)
+        self.train_label, self.test_label = train_test_split(int_labels, test_size=self.cross_validation, shuffle=False)
         log("[5] Dataset splitting: Done !")
         log("Dataset Loaded !")
         log("====================")
 
+    def unison_shuffle(self, a, b):
+        assert len(a) == len(b)
+        p = np.random.permutation(len(a))
+        return a[p], b[p]
 
     # ## Loading the Data
     def load_file(self, file_to_read):

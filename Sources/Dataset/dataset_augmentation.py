@@ -24,7 +24,7 @@ def noise_maker(sentence, threshold):
             new_random = np.random.uniform(0,1,1)
             # ~33% chance characters will swap locations
             if new_random > 0.67:
-                if i == (len(sentence) - 1):
+                if i == (len(sentence) - 1) or (sentence[i + 1].isdigit() and sentence[i].isdigit() and sentence[i].islower() and sentence[i + 1].islower()):
                     # If last character in sentence, it will not be typed
                     continue
                 else:
@@ -74,9 +74,9 @@ def dataset_augmentation(raw_dataset):
 
         data.append(shuffle_line(cleaned_line))
         labels.append(cleaned_label)
-        #
-        # data.append(noise_maker(cleaned_line, 0.25))
-        # labels.append(normal(cleaned_label))
+
+        data.append(noise_maker(cleaned_line, 0.25))
+        labels.append(normal(cleaned_label))
         #
         # data.append(noise_maker(cleaned_line, 0.50))
         # labels.append(normal(cleaned_label))

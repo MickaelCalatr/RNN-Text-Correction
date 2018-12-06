@@ -5,7 +5,7 @@ from Sources.Model.Configuration import config
 from Sources.Dataset.dataset import Dataset
 
 def train_model():
-    dataset = Dataset()
+    dataset = Dataset(config.cross_validation)
     dataset.create_dataset(config.input_file)
 
     training = Train(config)

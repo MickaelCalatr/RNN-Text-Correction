@@ -40,7 +40,6 @@ class Test(object):
 
         network = Network(self.conf)
         model = network.build_graph(self.batch_size, self.vocab_to_int)
-
         with tf.Session() as sess:
             # Load saved model
             saver = tf.train.Saver()
@@ -56,16 +55,13 @@ class Test(object):
         pad = self.vocab_to_int["<PAD>"]
 
         print('\nText')
-        print('  Word Ids:    {}'.format([i for i in text]))
-        print('  Input Words: {}'.format("".join([self.int_to_vocab[i] for i in text])))
-
-        print('\nSummary')
-        print('  Word Ids:       {}'.format([i for i in answer_logits if i != pad]))
-        print('  Response Words: {}'.format("".join([self.int_to_vocab[i] for i in answer_logits if i != pad])))
+        print('  Input Words:    {}'.format("".join([self.int_to_vocab[str(i)] for i in text if i != pad])))
+        print('  Response Words: {}'.format("".join([self.int_to_vocab[str(i)] for i in answer_logits if i != pad])))
 
 
     def text_to_ints(self, text):
         '''Prepare the text for the model'''
-        for i in range(15):
-            text += " "
-        return [self.vocab_to_int[word] for word in text]
+        ret = [self.vocab_to_int[word] for word in text]
+        for i in range(10):
+            ret.append(self.vocab_to_int['<PAD>'])
+        return ret

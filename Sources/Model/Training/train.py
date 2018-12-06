@@ -1,5 +1,5 @@
 import time
-
+import sys
 import numpy as np
 import tensorflow as tf
 
@@ -66,7 +66,7 @@ class Train(object):
 
             # Used to determine when to stop the training early
             testing_loss_summary = []
-
+            testing_acc_summary = []
             # Keep track of which batch iteration is being trained
             iteration = 0
             stop_early = 0
@@ -84,6 +84,7 @@ class Train(object):
                 batch_time = 0
 
                 acc = 0
+                step = 0
                 i = 0
                 for batch_i, (input_batch, target_batch, input_length, target_length) in enumerate(
                         self.get_batches(dataset.train_label, dataset.train_data, dataset.vocab_to_int)):
@@ -91,7 +92,7 @@ class Train(object):
 
                     summary, loss, _, accuracy = sess.run([model.merged, model.cost, model.train_op, model.accuracy], {model.inputs: input_batch, model.targets: target_batch, model.inputs_length: input_length, model.targets_length: target_length, model.keep_prob: self.conf.keep_prob})
 
-
+                    step += 1
                     batch_loss += loss
                     end_time = time.time()
                     batch_time += end_time - start_time
@@ -107,16 +108,18 @@ class Train(object):
                                       batch_i, total_batches,
                                       loss,
                                       batch_time,
-                                      100 * (acc / batch_i)))
+                                      100 * (acc / step)))
                         batch_loss = 0
                         batch_time = 0
+                        acc = 0
+                        step = 0
 
                     #### Testing ####
                     if batch_i % testing_check == 0 and batch_i > 0:
                         batch_loss_testing = 0
                         batch_time_testing = 0
-                        epoch_i += 1
                         acc_average = 0
+                        acc = 0
                         step = 0
                         for batch_i, (input_batch, target_batch, input_length, target_length) in enumerate(
                                 self.get_batches(dataset.test_label, dataset.test_data, dataset.vocab_to_int)):
@@ -138,15 +141,22 @@ class Train(object):
                             test_writer.add_summary(summary, iteration)
 
                         n_batches_testing = batch_i + 1
-                        print('Testing Loss: {:>6.3f}, Seconds: {:>4.2f}, Accuracy: {:>4.2f}'
-                              .format(batch_loss_testing / n_batches_testing,
-                                      batch_time_testing, acc_average / step))
+                        print('Testing Loss: {:>6.3f}, Seconds: {:>4.2f}, Accuracy: {:>4.2f}%'
+                              .format(batch_loss_testing / step,
+                                      batch_time_testing, 100 * (acc_average / step)))
 
                         batch_time_testing = 0
 
                         # If the batch_loss_testing is at a new minimum, save the model
                         testing_loss_summary.append(batch_loss_testing)
-                        if batch_loss_testing <= min(testing_loss_summary):
+                        testing_acc_summary.append(acc_average / step)
+                        # if batch_loss_testing <= min(testing_loss_summary):
+                        #     print('New Record!')
+                        #     stop_early = 0
+                        #     checkpoint = "./{}{}.ckpt".format(self.conf.directory, log_string)
+                        #     saver = tf.train.Saver()
+                        #     saver.save(sess, checkpoint)
+                        if acc_average / step >= max(testing_acc_summary):
                             print('New Record!')
                             stop_early = 0
                             checkpoint = "./{}{}.ckpt".format(self.conf.directory, log_string)
@@ -158,6 +168,6 @@ class Train(object):
                             if stop_early == self.stop:
                                 break
 
-                    if stop_early == self.stop:
-                        print("Stopping Training.")
-                        break
+                if stop_early == self.stop:
+                    print("Stopping Training.")
+                    break
