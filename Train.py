@@ -6,7 +6,8 @@ from Sources.Dataset.dataset import Dataset
 
 def train_model():
     dataset = Dataset(config.cross_validation)
-    dataset.create_dataset(config.input_file)
+    # dataset.open_dataset(config.input_file)
+    dataset.load_structure(config.input_file)
 
     training = Train(config)
     training.run(dataset)

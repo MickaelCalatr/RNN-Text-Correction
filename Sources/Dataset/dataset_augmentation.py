@@ -64,26 +64,29 @@ def normal(line):
 def dataset_augmentation(raw_dataset):
     data = []
     labels = []
+    i = 0
     for elements in raw_dataset:
-        line = elements['line']
-        label = elements['label']
-        cleaned_line = clean_text(line)
-        cleaned_label = clean_text(label)
-        data.append(cleaned_line)
-        labels.append(cleaned_label)
+        # line = elements['line']
+        # label = elements['label']
+        label = elements.split(';;')[0]
+        line = elements.split(';;')[1]
+        if len(label) > 5:
+            cleaned_line = clean_text(line)
+            cleaned_label = clean_text(label)
+            data.append(cleaned_line)
+            labels.append(cleaned_label)
 
-        data.append(shuffle_line(cleaned_line))
-        labels.append(cleaned_label)
+            if i % 2:
+                data.append(shuffle_line(cleaned_line))
+                labels.append(cleaned_label)
 
-        data.append(noise_maker(cleaned_line, 0.25))
-        labels.append(normal(cleaned_label))
-        #
-        # data.append(noise_maker(cleaned_line, 0.50))
-        # labels.append(normal(cleaned_label))
-        #
-        data.append(noise_maker(cleaned_line, 0.75))
-        labels.append(normal(cleaned_label))
-
-        # data.append(noise_maker(cleaned_line, 0.95))
-        # labels.append(normal(cleaned_label))
+            if i % 5:
+                data.append(noise_maker(cleaned_line, 0.85))
+                labels.append(cleaned_label)
+            i += 1
+            # data.append(noise_maker(cleaned_line, 0.50))
+            # labels.append(normal(cleaned_label))
+            #
+            # data.append(noise_maker(cleaned_line, 0.95))
+            # labels.append(normal(cleaned_label))
     return len(labels), data, labels

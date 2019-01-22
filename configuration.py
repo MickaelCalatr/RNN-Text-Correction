@@ -1,7 +1,9 @@
+#!/usr/bin/env python3.5
 import configparser
+import argparse
 import json
 
-from Common.directory_handler import check_path
+from Sources.Common.directory_handler import check_path
 
 VERSION = "1.8.3"
 
@@ -10,7 +12,9 @@ ap.add_argument("-i", "--input", help = "This is the dataset.", type=str, defaul
 ap.add_argument("-c", "--config_file", help = "Config file of the Network training.", type=str, default="./config.ini")
 
 ap.add_argument("-s", '--save_directory', help = "Directory to save all CNN files.", type=str, default="./Model/")
+ap.add_argument("-m", '--model', help = "Directory where the model is saved.", type=str, default="./Model/")
 ap.add_argument("-v", '--version', action='version', version='%(prog)s V' + str(VERSION))
+ap.add_argument("-t", "--test", help="String to test the model.", type=str)
 ap.add_argument("-l", "--log_verbose", help="Verbose mode to print the log.", type=bool, default=False)
 ap.add_argument("-lr", "--learning_rate", help="This field change the learning rate.", type=float, default=0.0)
 FLAGS = vars(ap.parse_args())
@@ -18,12 +22,12 @@ FLAGS = vars(ap.parse_args())
 class Configuration:
     def __init__(self, args):
         super(Config, self).__init__()
+        self.model_saved = check_path(args['model'])
         self.input_file = args['input']
         self.verbose = args['log_verbose']
         self.directory = check_path(args['save_directory'])
         self.train_directory = self.directory + "train/"
         self.summary_directory = self.directory + "log/"
-        self.
         # Network
         config = configparser.ConfigParser()
         config._interpolation = configparser.ExtendedInterpolation()
@@ -37,6 +41,7 @@ class Configuration:
         self.test_step = get(conf, 'Network', 'Test_step')
         self.batch_size = get(conf, 'Network', 'Batch_size')
         self.cross_validation = get(conf, 'Network', 'Cross_validation')
+        self.test = args['test']
 
 
     def get(self, conf, section, key=None):

@@ -12,6 +12,8 @@ ap.add_argument("-c", "--config_file", help = "Config file of the Network.", def
 
 ap.add_argument("-s", '--save_directory', help = "Directory to save all CNN files.", type=str, default="./Model/")
 ap.add_argument("-v", '--version', action='version', version='%(prog)s V' + str(VERSION))
+ap.add_argument("-m", '--model', help = "Directory where the model is saved.", type=str, default="./Model/")
+
 ap.add_argument("-l", "--log_verbose", help="Verbose mode to print the log.", type=bool, default=False)
 ap.add_argument("-t", "--test", help="String to test the model.", type=str)
 ap.add_argument("-lr", "--learning_rate", help="This field change the learning rate.", type=float, default=0.0)
@@ -21,6 +23,7 @@ class Configuration:
     def __init__(self, args):
         super(Configuration, self).__init__()
         self.input_file = args['input']
+        self.model_saved = check_path(args['model'])
         self.verbose = args['log_verbose']
         self.directory = check_path(args['save_directory'])
         self.train_directory = self.directory + "train/"
@@ -50,7 +53,7 @@ class Configuration:
 
         self.test = args['test']
 
-        
+
     def get(self, conf, section, key=None):
         result = {}
         options = conf.options(section)

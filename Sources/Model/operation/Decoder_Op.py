@@ -19,7 +19,7 @@ class DecoderOp:
                                                              input_keep_prob = keep_prob)
 
         output_layer = Dense(vocab_size,
-                             kernel_initializer = tf.truncated_normal_initializer(mean = 0.0, stddev=0.1))
+                             kernel_initializer = tf.truncated_normal_initializer(mean = 0.1, stddev=0.1))
 
         attn_mech = tf.contrib.seq2seq.BahdanauAttention(rnn_size,
                                                       enc_output,

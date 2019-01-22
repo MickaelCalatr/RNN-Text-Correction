@@ -1,0 +1,31 @@
+        {
+            "line": "BURN BIO TOMATE 24 1000C VC",
+            "label": "BURN  24X10L VC"
+        },
+        {
+            "line": "BURN BIO 24 1000.0CLS BTE",
+            "label": "BURN  24X10L BTE"
+        },
+        {
+            "line": "BURN BIO 24X BTE 1000.0CLS",
+            "label": "BURN  24X10L BTE"
+        }
+      ]
+}
+        {
+            "line": "BURN BIO CITRON 24 1000CL VC",
+            "label": "BURN  24X10L VC"
+        },
+        {
+            "line": "BURN BIO 24 1000.0C BTE",
+            "label": "BURN  24X10L BTE"
+        },
+        {
+            "line": "BURN BIO 24X BTE 1000.0C",
+            "label": "BURN  24X10L BTE"
+        },
+        {
+            "line": "BURN BIO TROPICAL 24 1000.0C BTE",
+            "label": "BURN  24X10L BTE"
+        }
+      ],
